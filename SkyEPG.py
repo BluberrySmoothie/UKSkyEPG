@@ -2,6 +2,7 @@ import csv
 import requests
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta, timezone
+from xml.dom import minidom  # Import minidom for pretty-printing XML
 
 def fetch_epg_data(channel_number, date):
     url = f"https://awk.epgsky.com/hawk/linear/schedule/{date}/{channel_number}"
@@ -46,9 +47,15 @@ def create_xmltv(channels, epg_data):
                 episode_elem = ET.SubElement(prog_elem, "episode-num", system="xmltv_ns")
                 episode_elem.text = str(f"{season}.{episode}.0")
     
-    # Write the XML to a file, ensuring encoding is set correctly
+    # Create ElementTree from the XML structure
     tree = ET.ElementTree(tv)
-    tree.write("epg.xml", encoding="utf-8", xml_declaration=True)
+    
+    # Use minidom to pretty-print the XML
+    xml_str = minidom.parseString(ET.tostring(tv)).toprettyxml(indent="  ")
+    
+    # Write the formatted XML to a file
+    with open("epg.xml", "w", encoding="utf-8") as f:
+        f.write(xml_str)
 
 def main():
     csv_file = "SkyChannels.csv"  # Update with actual file name
@@ -61,7 +68,7 @@ def main():
             channels.append({"channel": row[0], "tvg-id": row[1]})
     
     epg_data = {}
-    for i in range(9):  # Today + 8 days (Max number on Sky API)
+    for i in range(9):  # Today + 8 days
         date = (datetime.now() + timedelta(days=i)).strftime('%Y%m%d')
         for channel in channels:
             print(f"Fetching data for Channel: {channel['channel']}, TVG-ID: {channel['tvg-id']}, Date: {date}")
