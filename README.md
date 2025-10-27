@@ -1,3 +1,8 @@
+## Support the Project
+If you like my work, feel free to buy me a coffee! ☕
+https://buymeacoffee.com/BluberrySmoothie
+
+
 # UKSkyEPG
 Python code to extract Sky UK's EPG data from their publicly accessible API
 
